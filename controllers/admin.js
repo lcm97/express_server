@@ -212,9 +212,9 @@ function info(req, res) {
             AdminModel
                 .findByPk(token_data.data.id)
                 .then(function(result) {
-                    console.log(result)
-                        // 查询结果处理
-                        // 如果查询到结果
+                    //console.log(result)
+                    // 查询结果处理
+                    // 如果查询到结果
                     if (result) {
                         // 将查询到的结果给返回对象赋值
                         resObj.data = {
