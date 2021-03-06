@@ -1,5 +1,5 @@
 const Common = require('./common');
-const LinksModel = require('../models/links');
+const CompanyModel = require('../models/company');
 const Constant = require('../constant/constant');
 const dateFormat = require('dateformat');
 
@@ -20,7 +20,8 @@ function list(req, res) {
     let tasks = {
         // 校验参数方法
         checkParams: (cb) => {
-            // 调用公共方法中的校验参数方法，成功继续后面操作，失败则传递错误信息到async最终方法
+            console.log(req)
+                // 调用公共方法中的校验参数方法，成功继续后面操作，失败则传递错误信息到async最终方法
             Common.checkParams(req.query, ['page', 'limit'], cb);
         },
         // 查询方法，依赖校验参数方法
@@ -36,8 +37,11 @@ function list(req, res) {
             if (req.query.name) {
                 whereCondition.name = req.query.name;
             }
+            if (req.query.link_id) {
+                whereCondition.link_id = req.query.link_id;
+            }
             // 通过offset和limit使用model去数据库中查询，并按照创建时间排序
-            LinksModel
+            CompanyModel
                 .findAndCountAll({
                     where: whereCondition,
                     offset: offset,
@@ -55,8 +59,11 @@ function list(req, res) {
                         let obj = {
                             id: v.id,
                             name: v.name,
-                            remark: v.remark,
-                            music: v.music
+                            link_name: v.link_name,
+                            imglist: v.imglist.split(' '),
+                            contacts: v.contacts.split(' '),
+                            address: v.address,
+                            phone: v.phone
                         };
                         items.push(obj);
                     });

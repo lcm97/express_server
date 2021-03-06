@@ -9,6 +9,7 @@ const Links = db.define('Links', {
 
     name: { type: Sequelize.STRING(255), allowNull: false },
     remark: { type: Sequelize.STRING(255), allowNull: false },
+    music: { type: Sequelize.STRING(255), allowNull: false },
 }, {
     // 是否支持驼峰
     underscored: true,
