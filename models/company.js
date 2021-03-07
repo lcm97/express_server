@@ -10,6 +10,7 @@ const Company = db.define('Company', {
 
     imglist: { type: Sequelize.STRING, allowNull: false },
     contacts: { type: Sequelize.STRING, allowNull: false },
+    describe: { type: Sequelize.STRING, allowNull: false },
     address: { type: Sequelize.STRING(255), allowNull: false },
     phone: { type: Sequelize.STRING(12), allowNull: false },
 }, {

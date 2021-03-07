@@ -9,6 +9,7 @@ var usersRouter = require('./routes/users');
 var adminRouter = require('./routes/admin');
 var linksRouter = require('./routes/links');
 var companyRouter = require('./routes/company');
+var courseRouter = require('./routes/course')
 
 var app = express();
 
@@ -45,6 +46,7 @@ app.use('/users', usersRouter); //定义指向user.js的路由
 app.use('/admin', adminRouter)
 app.use('/links', linksRouter)
 app.use('/company', companyRouter)
+app.use('/course', courseRouter)
 
 //在此配置路由中间件
 //const verifyMiddleware = require('./routes/middleware/verify')

@@ -16,5 +16,7 @@ router.get('/', function(req, res, next) {
 // 定义上传文件路由，POST请求  key = file
 router.post('/upload', uploadMiddleware.single('file'), IndexController.upload);
 
+// 删除文件路由
+router.delete('/remove', IndexController.remove);
 
 module.exports = router;

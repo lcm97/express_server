@@ -13,6 +13,7 @@ const path = require('path');
 // 配置对象
 let exportObj = {
     upload,
+    remove,
 };
 // 导出对象，供其它模块调用
 module.exports = exportObj;
@@ -55,6 +56,39 @@ function upload(req, res) {
                 }
             })
 
+        }]
+
+    };
+    // 执行公共方法中的autoFn方法，返回数据
+    Common.autoFn(tasks, res, resObj)
+
+}
+
+
+function remove(req, res) {
+    // 定义一个返回对象
+    const resObj = Common.clone(Constant.DEFAULT_SUCCESS);
+    // 定义一个async任务
+    let tasks = {
+        // 校验参数方法
+        checkParams: (cb) => {
+            // 调用公共方法中的校验参数方法，成功继续后面操作，失败则传递错误信息到async最终方法
+            Common.checkParams(req.query, ['filename'], cb);
+        },
+        // 查询方法，依赖校验参数方法
+        save: ['checkParams', (results, cb) => {
+            let fileName = req.query.filename
+                // 删除文件
+            fs.unlink(path.join(__dirname, '../public/upload/' + fileName), function(err) {
+                if (err) {
+                    cb(Constant.REMOVE_FILE_ERROR)
+                } else {
+                    resObj.data = {
+                        fileName: fileName,
+                    };
+                    cb(null)
+                }
+            })
         }]
 
     };

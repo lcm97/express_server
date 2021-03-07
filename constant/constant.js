@@ -34,6 +34,16 @@ const obj = {
     ADMIN_NOT_EXSIT: {
         code: 103,
         msg: '管理员信息不存在'
+    },
+    // 定义错误返回-保存文件失败
+    SAVE_FILE_ERROR: {
+        code: 104,
+        msg: '保存文件失败'
+    },
+    // 定义删除文件失败
+    REMOVE_FILE_ERROR: {
+        code: 105,
+        msg: '删除文件失败'
     }
 };
 // 导出对象，给其他方法调用

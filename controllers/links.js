@@ -95,7 +95,6 @@ function findall(req, res) {
             LinksModel
                 .findAll({ raw: true })
                 .then(function(result) {
-                    console.log(result)
                     let items = [];
                     result.forEach((v, i) => {
                         let obj = {
