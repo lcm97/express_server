@@ -5,11 +5,12 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index'); //引入index模块路由文件
-var usersRouter = require('./routes/users');
+var userRouter = require('./routes/user');
 var adminRouter = require('./routes/admin');
 var linksRouter = require('./routes/links');
 var companyRouter = require('./routes/company');
 var courseRouter = require('./routes/course')
+var groupRouter = require('./routes/group')
 
 var app = express();
 
@@ -42,11 +43,12 @@ app.all('*', function(req, res, next) {
 
 //路由
 app.use('/', indexRouter); //定义指向index.js的路由
-app.use('/users', usersRouter); //定义指向user.js的路由
+app.use('/user', userRouter); //定义指向user.js的路由
 app.use('/admin', adminRouter)
 app.use('/links', linksRouter)
 app.use('/company', companyRouter)
 app.use('/course', courseRouter)
+app.use('/group', groupRouter)
 
 //在此配置路由中间件
 //const verifyMiddleware = require('./routes/middleware/verify')

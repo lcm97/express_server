@@ -5,6 +5,7 @@ const Course = db.define('Course', {
     // 主键
     id: { type: Sequelize.INTEGER, primaryKey: true, allowNull: false, autoIncrement: true },
     name: { type: Sequelize.STRING(255), allowNull: false },
+    link_id: { type: Sequelize.INTEGER, allowNull: false, },
     company: { type: Sequelize.STRING(255), allowNull: false },
     img: { type: Sequelize.STRING(255), allowNull: false },
 

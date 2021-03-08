@@ -9,5 +9,8 @@ router.put('/update', CourseController.update);
 router.delete('/remove', CourseController.remove)
 
 router.get('/findall', CourseController.findall)
+router.get('/info', CourseController.info)
+router.put('/draft', CourseController.draft)
+router.put('/publish', CourseController.publish)
 
 module.exports = router;

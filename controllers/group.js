@@ -1,5 +1,5 @@
 const Common = require('./common');
-const CourseModel = require('../models/course');
+const GroupModel = require('../models/group');
 
 const Constant = require('../constant/constant');
 const dateFormat = require('dateformat');
@@ -10,10 +10,7 @@ let exportObj = {
     add,
     update,
     remove,
-    findall,
     info,
-    draft,
-    publish
 }
 module.exports = exportObj;
 
@@ -28,14 +25,13 @@ function list(req, res) {
             let limit = parseInt(req.query.limit) || 20;
 
             let whereCondition = {};
-            if (req.query.name) {
-                whereCondition.name = req.query.name;
+            if (req.query.cap_name) {
+                whereCondition.cap_name = req.query.cap_name;
             }
-            if (req.query.company) {
-                whereCondition.company = req.query.company;
+            if (req.query.id) {
+                whereCondition.id = req.query.id;
             }
-
-            CourseModel
+            GroupModel
                 .findAndCountAll({
                     where: whereCondition,
                     offset: offset,
@@ -49,70 +45,19 @@ function list(req, res) {
                     result.rows.forEach((v, i) => {
                         let obj = {
                             id: v.id,
-                            name: v.name,
-                            company: v.company,
-                            img: v.img,
-                            ori_price: v.ori_price,
-                            price: v.price,
-                            class: v.class,
-                            status: v.status,
-                            all: v.all,
-                            new: v.new,
-                            old: v.old,
-                            payed: v.payed,
-                            unpayed: v.unpayed,
+                            type: v.type,
+                            num: v.num,
+                            cap_id: v.cap_id,
+                            cap_name: v.cap_name,
+                            created_at: dateFormat(v.created_at, 'yyyy-mm-dd')
                         };
+                        obj.crewlist = v.crewlist === null ? [] : v.crewlist.split(' ')
                         items.push(obj);
                     });
-                    // 给返回结果赋值，包括列表和总条数
                     resObj.data = {
                         items,
                         total: result.count
                     };
-                    // 继续后续操作
-                    cb(null);
-                })
-                .catch(function(err) {
-                    // 错误处理
-                    // 打印错误日志
-                    console.log(err);
-                    // 传递错误信息到async最终方法
-                    cb(Constant.DEFAULT_ERROR);
-                });
-
-        }]
-    };
-    // 执行公共方法中的autoFn方法，返回数据
-    Common.autoFn(tasks, res, resObj)
-
-}
-
-
-function findall(req, res) {
-    const resObj = Common.clone(Constant.DEFAULT_SUCCESS);
-    let tasks = {
-        checkParams: (cb) => {
-            cb(null)
-                //Common.checkParams(req.query, ['page', 'limit'], cb);
-        },
-        query: ['checkParams', (results, cb) => {
-            let whereCondition = {};
-            if (req.query.company) {
-                console.log(req.query.company)
-                whereCondition.company = req.query.company;
-            }
-            CourseModel
-                .findAll({ raw: true, where: whereCondition, })
-                .then(function(result) {
-                    let items = [];
-                    result.forEach((v, i) => {
-                        let obj = {
-                            id: v.id,
-                            name: v.name,
-                        };
-                        items.push(obj);
-                    });
-                    resObj.data = { items };
                     cb(null);
                 })
                 .catch(function(err) {
@@ -124,6 +69,7 @@ function findall(req, res) {
     };
     // 执行公共方法中的autoFn方法，返回数据
     Common.autoFn(tasks, res, resObj)
+
 }
 
 
@@ -134,7 +80,7 @@ function add(req, res) {
             Common.checkParams(req.body, ['name', 'company', 'img', 'price', 'class', 'status'], cb);
         },
         add: cb => {
-            CourseModel
+            GroupModel
                 .create({
                     name: req.body.name,
                     company: req.body.company,
@@ -187,10 +133,9 @@ function update(req, res) {
             Common.checkParams(req.body, ['id', 'name', 'company', 'img', 'price', 'class', 'status'], cb);
         },
         update: cb => {
-            CourseModel
+            GroupModel
                 .update({
                     name: req.body.name,
-                    link_id: req.body.link_id,
                     company: req.body.company,
                     img: req.body.img,
                     ori_price: parseFloat(req.body.ori_price.toFixed(2)),
@@ -228,21 +173,10 @@ function remove(req, res) {
     const resObj = Common.clone(Constant.DEFAULT_SUCCESS);
     let tasks = {
         checkParams: (cb) => {
-            Common.checkParams(req.body, ['id', 'img'], cb);
+            Common.checkParams(req.body, ['id'], cb);
         },
-        // 删除文件
-        delete: cb => {
-            let imgname = req.body.img.split('/').slice(-1)[0]
-            fs.unlink(path.join(__dirname, '../public/upload/' + imgname), function(err) {
-                if (err) {
-                    cb(Constant.REMOVE_FILE_ERROR)
-                }
-            })
-            cb(null)
-        },
-        // 删除方法，依赖校验参数方法
         remove: cb => {
-            CourseModel
+            GroupModel
                 .destroy({
                     where: {
                         id: req.body.id
@@ -261,7 +195,6 @@ function remove(req, res) {
                 });
         }
     };
-    // 执行公共方法中的autoFn方法，返回数据
     Common.autoFn(tasks, res, resObj)
 }
 
@@ -272,7 +205,7 @@ function info(req, res) {
             Common.checkParams(req.query, ['id'], cb);
         },
         query: ['checkParams', (results, cb) => {
-            CourseModel
+            GroupModel
                 .findByPk(req.query.id)
                 .then(function(result) {
                     if (result) {
@@ -305,68 +238,4 @@ function info(req, res) {
     };
     Common.autoFn(tasks, res, resObj)
 
-}
-
-function draft(req, res) {
-    const resObj = Common.clone(Constant.DEFAULT_SUCCESS);
-    let tasks = {
-        checkParams: (cb) => {
-            Common.checkParams(req.query, ['id'], cb);
-        },
-        draft: ['checkParams', (results, cb) => {
-            CourseModel
-                .update({
-                    status: '下架'
-                }, {
-                    where: {
-                        id: req.query.id
-                    }
-                }).then(function(result) {
-                    if (result[0]) {
-                        console.log(result)
-                        cb(null);
-                    } else {
-                        cb(Constant.WISH_NOT_EXSIT);
-                    }
-                })
-                .catch(function(err) {
-                    console.log(err);
-                    cb(Constant.DEFAULT_ERROR);
-                });
-
-        }]
-    };
-    Common.autoFn(tasks, res, resObj)
-}
-
-function publish(req, res) {
-    const resObj = Common.clone(Constant.DEFAULT_SUCCESS);
-    let tasks = {
-        checkParams: (cb) => {
-            Common.checkParams(req.query, ['id'], cb);
-        },
-        draft: ['checkParams', (results, cb) => {
-            CourseModel
-                .update({
-                    status: '进行中'
-                }, {
-                    where: {
-                        id: req.query.id
-                    }
-                }).then(function(result) {
-                    if (result[0]) {
-                        console.log(result)
-                        cb(null);
-                    } else {
-                        cb(Constant.WISH_NOT_EXSIT);
-                    }
-                })
-                .catch(function(err) {
-                    console.log(err);
-                    cb(Constant.DEFAULT_ERROR);
-                });
-
-        }]
-    };
-    Common.autoFn(tasks, res, resObj)
 }

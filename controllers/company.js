@@ -99,8 +99,12 @@ function findall(req, res) {
                 //Common.checkParams(req.query, ['page', 'limit'], cb);
         },
         query: ['checkParams', (results, cb) => {
+            let whereCondition = {};
+            if (req.query.link_id) {
+                whereCondition.link_id = req.query.link_id;
+            }
             CompanyModel
-                .findAll({ raw: true })
+                .findAll({ raw: true, where: whereCondition, })
                 .then(function(result) {
                     let items = [];
                     result.forEach((v, i) => {
@@ -250,6 +254,43 @@ function remove(req, res) {
                     cb(Constant.DEFAULT_ERROR);
                 });
         }
+    };
+    // 执行公共方法中的autoFn方法，返回数据
+    Common.autoFn(tasks, res, resObj)
+}
+
+function findbylink(req, res) {
+    const resObj = Common.clone(Constant.DEFAULT_SUCCESS);
+    let tasks = {
+        checkParams: (cb) => {
+            Common.checkParams(req.query, ['link_id'], cb);
+        },
+        query: ['checkParams', (results, cb) => {
+            CompanyModel
+                .findAll({
+                    raw: true,
+                    where: {
+                        link_id: req.query.link_id
+                    }
+                })
+                .then(function(result) {
+                    let items = [];
+                    result.forEach((v, i) => {
+                        let obj = {
+                            id: v.id,
+                            name: v.name,
+                        };
+                        items.push(obj);
+                    });
+                    resObj.data = { items };
+                    cb(null);
+                })
+                .catch(function(err) {
+                    console.log(err);
+                    cb(Constant.DEFAULT_ERROR);
+                });
+
+        }]
     };
     // 执行公共方法中的autoFn方法，返回数据
     Common.autoFn(tasks, res, resObj)
