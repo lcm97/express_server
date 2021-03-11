@@ -5,12 +5,14 @@ const Constant = require('../constant/constant');
 const dateFormat = require('dateformat');
 const fs = require('fs');
 const path = require('path');
+const { doUntil } = require('async');
 let exportObj = {
     list,
     add,
     update,
     remove,
     info,
+    iscap
 }
 module.exports = exportObj;
 
@@ -77,39 +79,21 @@ function add(req, res) {
     const resObj = Common.clone(Constant.DEFAULT_SUCCESS);
     let tasks = {
         checkParams: (cb) => {
-            Common.checkParams(req.body, ['name', 'company', 'img', 'price', 'class', 'status'], cb);
+            Common.checkParams(req.body, ['link_id', 'name', 'id'], cb);
         },
         add: cb => {
             GroupModel
                 .create({
-                    name: req.body.name,
-                    company: req.body.company,
-                    img: req.body.img,
-                    ori_price: parseFloat(req.body.ori_price.toFixed(2)),
-                    price: parseFloat(req.body.price.toFixed(2)),
-                    class: req.body.class,
-                    status: req.body.status,
-                    all: req.body.all,
-                    new: req.body.new,
-                    old: req.body.old,
-                    payed: req.body.payed,
-                    unpayed: req.body.unpayed
+                    type: 3, //新建团默认为3人团
+                    num: 1, //只有团长一人
+                    link_id: req.body.link_id,
+                    cap_name: req.body.name,
+                    cap_id: req.body.id,
+                    crewlist: '',
                 })
                 .then(function(result) {
                     let item = {
-                        id: result.dataValues.id,
-                        name: result.dataValues.name,
-                        company: result.dataValues.company,
-                        img: result.dataValues.img,
-                        ori_price: result.dataValues.ori_price,
-                        price: result.dataValues.price,
-                        class: result.dataValues.class,
-                        status: result.dataValues.status,
-                        all: result.dataValues.all,
-                        new: result.dataValues.new,
-                        old: result.dataValues.old,
-                        payed: result.dataValues.payed,
-                        unpayed: result.dataValues.unpayed
+                        id: result.dataValues.id, //新增的团号
                     }
                     resObj.data = {
                         item
@@ -196,6 +180,42 @@ function remove(req, res) {
         }
     };
     Common.autoFn(tasks, res, resObj)
+}
+
+function iscap(req, res) {
+    const resObj = Common.clone(Constant.DEFAULT_SUCCESS);
+    let tasks = {
+        checkParams: (cb) => {
+            Common.checkParams(req.query, ['id'], cb);
+        },
+        query: ['checkParams', (results, cb) => {
+            let whereCondition = {};
+            if (req.query.id) {
+                whereCondition.cap_id = req.query.id;
+            }
+            GroupModel
+                .findAll({ raw: true, where: whereCondition, })
+                .then(function(result) {
+                    let items = [];
+                    result.forEach((v, i) => {
+                        let obj = {
+                            id: v.id,
+                            name: v.cap_name,
+                        };
+                        items.push(obj);
+                    });
+                    resObj.data = { items };
+                    cb(null);
+                })
+                .catch(function(err) {
+                    console.log(err);
+                    cb(Constant.DEFAULT_ERROR);
+                });
+
+        }]
+    };
+    Common.autoFn(tasks, res, resObj)
+
 }
 
 function info(req, res) {

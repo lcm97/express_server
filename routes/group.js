@@ -9,4 +9,6 @@ router.put('/update', GroupController.update);
 router.delete('/remove', GroupController.remove)
 router.get('/info', GroupController.info)
 
+router.get('/iscap', GroupController.iscap)
+
 module.exports = router;
