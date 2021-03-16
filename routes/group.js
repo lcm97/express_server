@@ -10,5 +10,6 @@ router.delete('/remove', GroupController.remove)
 router.get('/info', GroupController.info)
 
 router.get('/iscap', GroupController.iscap)
+router.get('/listbyid', GroupController.listbyid)
 
 module.exports = router;
