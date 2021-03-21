@@ -31,9 +31,16 @@ function list(req, res) {
             if (req.query.cap_name) {
                 whereCondition.cap_name = req.query.cap_name;
             }
+            if (req.query.cap_id) {
+                whereCondition.cap_id = req.query.cap_id;
+            }
+            if (req.query.link_id) {
+                whereCondition.link_id = req.query.link_id;
+            }
             if (req.query.id) {
                 whereCondition.id = req.query.id;
             }
+
             GroupModel
                 .findAndCountAll({
                     where: whereCondition,
@@ -48,6 +55,7 @@ function list(req, res) {
                     result.rows.forEach((v, i) => {
                         let obj = {
                             id: v.id,
+                            avatar: v.avatar,
                             type: v.type,
                             num: v.num,
                             cap_id: v.cap_id,
@@ -297,3 +305,5 @@ function listbyid(req, res) {
     // 执行公共方法中的autoFn方法，返回数据
     Common.autoFn(tasks, res, resObj)
 }
+
+//for app

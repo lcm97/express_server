@@ -5,6 +5,7 @@ const Group = db.define('Group', {
     // 主键
     id: { type: Sequelize.INTEGER, primaryKey: true, allowNull: false, autoIncrement: true },
     type: { type: Sequelize.INTEGER, allowNull: false, },
+    avatar: { type: Sequelize.STRING(255), allowNull: false },
     num: { type: Sequelize.INTEGER, allowNull: false, },
     link_id: { type: Sequelize.INTEGER, allowNull: false, },
     cap_id: { type: Sequelize.INTEGER, allowNull: false, },
