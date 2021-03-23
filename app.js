@@ -11,6 +11,7 @@ var linksRouter = require('./routes/links');
 var companyRouter = require('./routes/company');
 var courseRouter = require('./routes/course')
 var groupRouter = require('./routes/group')
+var welfareRouter = require('./routes/welfare')
 
 var app = express();
 
@@ -49,6 +50,7 @@ app.use('/links', linksRouter)
 app.use('/company', companyRouter)
 app.use('/course', courseRouter)
 app.use('/group', groupRouter)
+app.use('/welfare', welfareRouter)
 
 //在此配置路由中间件
 //const verifyMiddleware = require('./routes/middleware/verify')

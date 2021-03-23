@@ -13,4 +13,6 @@ router.get('/info', CourseController.info)
 router.put('/draft', CourseController.draft)
 router.put('/publish', CourseController.publish)
 
+router.get('/listbyid', CourseController.listbyid)
+
 module.exports = router;

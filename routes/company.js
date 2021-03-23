@@ -8,6 +8,7 @@ router.post('/add', CompanyController.add);
 router.put('/update', CompanyController.update);
 router.delete('/remove', CompanyController.remove)
 
+router.get('/listbyid', CompanyController.listbyid)
 router.get('/findall', CompanyController.findall)
 
 module.exports = router;

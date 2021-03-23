@@ -9,7 +9,8 @@ let exportObj = {
     add,
     update,
     remove,
-    findall,
+    listbyid,
+    findall
 }
 
 module.exports = exportObj;
@@ -18,27 +19,20 @@ module.exports = exportObj;
 function list(req, res) {
     const resObj = Common.clone(Constant.DEFAULT_SUCCESS);
     let tasks = {
-        // 校验参数方法
         checkParams: (cb) => {
             Common.checkParams(req.query, ['page', 'limit'], cb);
         },
-        // 查询方法，依赖校验参数方法
         query: ['checkParams', (results, cb) => {
-            // 根据前端提交参数计算SQL语句中需要的offset，即从多少条开始查询
             let offset = req.query.limit * (req.query.page - 1) || 0;
-            // 根据前端提交参数计算SQL语句中需要的limit，即查询多少条
             let limit = parseInt(req.query.limit) || 20;
 
-            // 设定一个查询条件对象
             let whereCondition = {};
-            // 如果查询姓名存在，查询对象增加姓名
             if (req.query.name) {
                 whereCondition.name = req.query.name;
             }
             if (req.query.link_id) {
                 whereCondition.link_id = req.query.link_id;
             }
-            // 通过offset和limit使用model去数据库中查询，并按照创建时间排序
             CompanyModel
                 .findAndCountAll({
                     where: whereCondition,
@@ -88,44 +82,6 @@ function list(req, res) {
     // 执行公共方法中的autoFn方法，返回数据
     Common.autoFn(tasks, res, resObj)
 
-}
-
-
-function findall(req, res) {
-    const resObj = Common.clone(Constant.DEFAULT_SUCCESS);
-    let tasks = {
-        checkParams: (cb) => {
-            cb(null)
-                //Common.checkParams(req.query, ['page', 'limit'], cb);
-        },
-        query: ['checkParams', (results, cb) => {
-            let whereCondition = {};
-            if (req.query.link_id) {
-                whereCondition.link_id = req.query.link_id;
-            }
-            CompanyModel
-                .findAll({ raw: true, where: whereCondition, })
-                .then(function(result) {
-                    let items = [];
-                    result.forEach((v, i) => {
-                        let obj = {
-                            id: v.id,
-                            name: v.name,
-                        };
-                        items.push(obj);
-                    });
-                    resObj.data = { items };
-                    cb(null);
-                })
-                .catch(function(err) {
-                    console.log(err);
-                    cb(Constant.DEFAULT_ERROR);
-                });
-
-        }]
-    };
-    // 执行公共方法中的autoFn方法，返回数据
-    Common.autoFn(tasks, res, resObj)
 }
 
 function add(req, res) {
@@ -259,7 +215,7 @@ function remove(req, res) {
     Common.autoFn(tasks, res, resObj)
 }
 
-function findbylink(req, res) {
+function listbyid(req, res) {
     const resObj = Common.clone(Constant.DEFAULT_SUCCESS);
     let tasks = {
         checkParams: (cb) => {
@@ -273,6 +229,50 @@ function findbylink(req, res) {
                         link_id: req.query.link_id
                     }
                 })
+                .then(function(result) {
+                    let items = [];
+                    result.forEach((v, i) => {
+                        let obj = {
+                            id: v.id,
+                            name: v.name,
+                            link_id: v.link_id,
+                            link_name: v.link_name,
+                            imglist: v.imglist.split(' '),
+                            contacts: v.contacts.split(' '),
+                            describe: v.describe,
+                            address: v.address,
+                            phone: v.phone
+                        };
+                        items.push(obj);
+                    });
+                    resObj.data = { items };
+                    cb(null);
+                })
+                .catch(function(err) {
+                    console.log(err);
+                    cb(Constant.DEFAULT_ERROR);
+                });
+
+        }]
+    };
+    // 执行公共方法中的autoFn方法，返回数据
+    Common.autoFn(tasks, res, resObj)
+}
+
+function findall(req, res) {
+    const resObj = Common.clone(Constant.DEFAULT_SUCCESS);
+    let tasks = {
+        checkParams: (cb) => {
+            cb(null)
+                //Common.checkParams(req.query, ['page', 'limit'], cb);
+        },
+        query: ['checkParams', (results, cb) => {
+            let whereCondition = {};
+            if (req.query.link_id) {
+                whereCondition.link_id = req.query.link_id;
+            }
+            CompanyModel
+                .findAll({ raw: true, where: whereCondition, })
                 .then(function(result) {
                     let items = [];
                     result.forEach((v, i) => {
