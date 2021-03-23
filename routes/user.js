@@ -6,5 +6,7 @@ router.get('/list', UserController.list);
 router.put('/update', UserController.update)
 router.delete('/remove', UserController.remove)
 
+router.get('/findorcreate', UserController.findorcreate)
+
 
 module.exports = router;

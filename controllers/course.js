@@ -14,7 +14,8 @@ let exportObj = {
     info,
     draft,
     publish,
-    listbyid
+    listbyid,
+    listbyname
 }
 module.exports = exportObj;
 
@@ -383,6 +384,51 @@ function listbyid(req, res) {
             let whereCondition = {};
             if (req.query.link_id) {
                 whereCondition.link_id = req.query.link_id;
+            }
+            whereCondition.status = '进行中';
+            CourseModel
+                .findAll({ raw: true, where: whereCondition, })
+                .then(function(result) {
+                    let items = [];
+                    result.forEach((v, i) => {
+                        let obj = {
+                            id: v.id,
+                            img: v.img,
+                            name: v.name,
+                            price: v.price,
+                            ori_price: v.ori_price,
+                            class: v.class
+                        };
+                        items.push(obj);
+                    });
+                    resObj.data = { items };
+                    cb(null);
+                })
+                .catch(function(err) {
+                    console.log(err);
+                    cb(Constant.DEFAULT_ERROR);
+                });
+
+        }]
+    };
+    // 执行公共方法中的autoFn方法，返回数据
+    Common.autoFn(tasks, res, resObj)
+}
+
+function listbyname(req, res) {
+    const resObj = Common.clone(Constant.DEFAULT_SUCCESS);
+    let tasks = {
+        checkParams: (cb) => {
+            //cb(null)
+            Common.checkParams(req.query, ['link_id', 'company'], cb);
+        },
+        query: ['checkParams', (results, cb) => {
+            let whereCondition = {};
+            if (req.query.link_id) {
+                whereCondition.link_id = req.query.link_id;
+            }
+            if (req.query.company) {
+                whereCondition.company = req.query.company;
             }
             whereCondition.status = '进行中';
             CourseModel

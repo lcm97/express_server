@@ -14,5 +14,6 @@ router.put('/draft', CourseController.draft)
 router.put('/publish', CourseController.publish)
 
 router.get('/listbyid', CourseController.listbyid)
+router.get('/listbyname', CourseController.listbyname)
 
 module.exports = router;

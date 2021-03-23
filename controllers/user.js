@@ -11,6 +11,7 @@ let exportObj = {
     update,
     remove,
     info,
+    findorcreate
 }
 module.exports = exportObj;
 
@@ -246,6 +247,41 @@ function info(req, res) {
 
         }]
     };
+    Common.autoFn(tasks, res, resObj)
+
+}
+
+function findorcreate(req, res) {
+    const resObj = Common.clone(Constant.DEFAULT_SUCCESS);
+    let tasks = {
+        checkParams: (cb) => {
+            Common.checkParams(req.query, ['openid', 'avatar'], cb);
+        },
+        query: ['checkParams', (results, cb) => {
+            let whereCondition = {};
+            if (req.query.openid) {
+                whereCondition.openid = req.query.openid;
+            }
+            if (req.query.avatar) {
+                whereCondition.avatar = req.query.avatar;
+            }
+            UserModel
+                .findOrCreate({
+                    where: whereCondition,
+                    raw: true,
+                })
+                .then(function(result) {
+                    resObj.data = result;
+                    cb(null);
+                })
+                .catch(function(err) {
+                    console.log(err);
+                    cb(Constant.DEFAULT_ERROR);
+                });
+
+        }]
+    };
+    // 执行公共方法中的autoFn方法，返回数据
     Common.autoFn(tasks, res, resObj)
 
 }
