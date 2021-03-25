@@ -265,6 +265,9 @@ function findorcreate(req, res) {
             if (req.query.avatar) {
                 whereCondition.avatar = req.query.avatar;
             }
+            if (req.query.link_id) {
+                whereCondition.link_id = req.query.link_id;
+            }
             UserModel
                 .findOrCreate({
                     where: whereCondition,

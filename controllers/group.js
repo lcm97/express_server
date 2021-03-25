@@ -1,5 +1,7 @@
 const Common = require('./common');
 const GroupModel = require('../models/group');
+const UserModel = require('../models/user')
+const CourseModel = require('../models/course')
 
 const Constant = require('../constant/constant');
 const dateFormat = require('dateformat');
@@ -13,7 +15,9 @@ let exportObj = {
     remove,
     info,
     iscap,
-    listbyid
+    listbyid,
+    joingroup,
+    opengroup
 }
 module.exports = exportObj;
 
@@ -240,18 +244,14 @@ function info(req, res) {
                     if (result) {
                         resObj.data = {
                             id: result.id,
-                            name: result.name,
-                            company: result.company,
-                            img: result.img,
-                            ori_price: result.ori_price,
-                            price: result.price,
-                            class: result.class,
-                            status: result.status,
-                            all: result.all,
-                            new: result.new,
-                            old: result.old,
-                            payed: result.payed,
-                            unpayed: result.unpayed
+                            type: result.type,
+                            avatar: result.avatar,
+                            num: result.num,
+                            link_id: result.link_id,
+                            cap_name: result.cap_name,
+                            cap_id: result.cap_id,
+                            crewlist: result.crewlist,
+                            created_at: result.created_at,
                         };
                         cb(null);
                     } else {
@@ -307,3 +307,237 @@ function listbyid(req, res) {
 }
 
 //for app
+//参团事务
+function joingroup(req, res) {
+    const resObj = Common.clone(Constant.DEFAULT_SUCCESS);
+    let tasks = {
+        checkParams: (cb) => {
+            //cb(null)
+            Common.checkParams(req.body, ['group_id'], cb);
+        },
+        updateGroup: ['checkParams', (results, cb) => {
+            //console.log(req.body)
+            //更新团成员
+            GroupModel.findByPk(req.body.group_id).then(function(result) {
+                //console.log(result.dataValues)
+                let num = result.dataValues.num + 1
+                let crewlist = result.dataValues.crewlist === null ? req.body.name : result.dataValues.crewlist + ' ' + req.body.name
+                let type = Common.getGroupType(num)
+                GroupModel
+                    .update({
+                        type: type,
+                        num: num,
+                        crewlist: crewlist
+                    }, {
+                        where: {
+                            id: req.body.group_id
+                        }
+                    })
+                    .then(function(result) {
+                        console.log(result)
+                        if (result[0]) {
+                            console.log(result[0])
+                            let item = result[0]
+                            resObj.data = {
+                                item
+                            };
+                            cb(null);
+                        } else {
+                            cb(Constant.WISH_NOT_EXSIT);
+                        }
+                    })
+                    .catch(function(err) {
+                        console.log(err);
+                        cb(Constant.DEFAULT_ERROR);
+                    });
+            })
+        }],
+        updateUser: ['updateGroup', (results, cb) => {
+            UserModel
+                .update({
+                    name: req.body.name,
+                    phone: req.body.phone,
+                    age: req.body.age,
+                    identity: req.body.identity,
+                    company: req.body.company,
+                    course: req.body.course,
+                    group_id: req.body.group_id,
+                    status: req.body.status
+                }, {
+                    where: {
+                        id: req.body.user_id
+                    }
+                })
+                .then(function(result) {
+                    if (result[0]) {
+                        cb(null);
+                    } else {
+                        cb(Constant.WISH_NOT_EXSIT);
+                    }
+                })
+                .catch(function(err) {
+                    console.log(err);
+                    cb(Constant.DEFAULT_ERROR);
+                });
+
+            //cb(null)
+        }],
+        updateCourse: ['updateUser', (results, cb) => {
+            CourseModel.findOne({ where: { name: req.body.course } }).then(function(result) {
+                let all = result.dataValues.all + 1
+                let _new = result.dataValues.new
+                let old = result.dataValues.old
+                let payed = result.dataValues.payed
+                let unpayed = result.dataValues.unpayed
+                if (req.body.identity == '新生') {
+                    _new = _new + 1
+                } else {
+                    old = old + 1
+                }
+                if (req.body.status == '已付款') {
+                    payed = payed + 1
+                } else {
+                    unpayed = unpayed + 1
+                }
+                CourseModel
+                    .update({
+                        all: all,
+                        new: _new,
+                        old: old,
+                        payed: payed,
+                        unpayed: unpayed,
+                    }, {
+                        where: {
+                            name: req.body.course
+                        }
+                    })
+                    .then(function(result) {
+                        if (result[0]) {
+                            cb(null);
+                        } else {
+                            cb(Constant.WISH_NOT_EXSIT);
+                        }
+                    })
+                    .catch(function(err) {
+                        console.log(err);
+                        cb(Constant.DEFAULT_ERROR);
+                    });
+
+            })
+        }],
+    };
+    // 执行公共方法中的autoFn方法，返回数据
+    Common.autoFn(tasks, res, resObj)
+}
+
+//开团
+function opengroup(req, res) {
+    const resObj = Common.clone(Constant.DEFAULT_SUCCESS);
+    let tasks = {
+        checkParams: (cb) => {
+            //cb(null)
+            Common.checkParams(req.body, ['user_id'], cb);
+        },
+        openGroup: ['checkParams', (results, cb) => {
+            //console.log(req.body)
+            //新建团
+            GroupModel
+                .create({
+                    type: 3, //新建团默认为3人团
+                    num: 1, //只有团长一人
+                    avatar: req.body.avatar,
+                    link_id: req.body.link_id,
+                    cap_name: req.body.name,
+                    cap_id: req.body.user_id,
+                    crewlist: '',
+                })
+                .then(function(result) {
+                    //console.log(result.dataValues.id)
+                    let item = result.dataValues
+                    resObj.data = {
+                        item
+                    };
+                    cb(null);
+                })
+                .catch(function(err) {
+                    console.log(err);
+                    cb(Constant.DEFAULT_ERROR);
+                });
+        }],
+        updateUser: ['openGroup', (results, cb) => {
+            UserModel
+                .update({
+                    name: req.body.name,
+                    phone: req.body.phone,
+                    age: req.body.age,
+                    identity: req.body.identity,
+                    company: req.body.company,
+                    course: req.body.course,
+                    group_id: resObj.data.item.id,
+                    status: req.body.status
+                }, {
+                    where: {
+                        id: req.body.user_id
+                    }
+                })
+                .then(function(result) {
+                    if (result[0]) {
+                        //console.log(result[0])
+                        cb(null);
+                    } else {
+                        cb(Constant.WISH_NOT_EXSIT);
+                    }
+                })
+                .catch(function(err) {
+                    console.log(err);
+                    cb(Constant.DEFAULT_ERROR);
+                });
+        }],
+        updateCourse: ['updateUser', (results, cb) => {
+            CourseModel.findOne({ where: { name: req.body.course } }).then(function(result) {
+                console.log(result.dataValues)
+                let all = result.dataValues.all + 1
+                let _new = result.dataValues.new
+                let old = result.dataValues.old
+                let payed = result.dataValues.payed
+                let unpayed = result.dataValues.unpayed
+                if (req.body.identity == '新生') {
+                    _new = _new + 1
+                } else {
+                    old = old + 1
+                }
+                if (req.body.status == '已付款') {
+                    payed = payed + 1
+                } else {
+                    unpayed = unpayed + 1
+                }
+                CourseModel
+                    .update({
+                        all: all,
+                        new: _new,
+                        old: old,
+                        payed: payed,
+                        unpayed: unpayed,
+                    }, {
+                        where: {
+                            name: req.body.course
+                        }
+                    })
+                    .then(function(result) {
+                        if (result[0]) {
+                            cb(null);
+                        } else {
+                            cb(Constant.WISH_NOT_EXSIT);
+                        }
+                    })
+                    .catch(function(err) {
+                        console.log(err);
+                        cb(Constant.DEFAULT_ERROR);
+                    });
+
+            })
+        }],
+    };
+    // 执行公共方法中的autoFn方法，返回数据
+    Common.autoFn(tasks, res, resObj)
+}

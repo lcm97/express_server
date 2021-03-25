@@ -7,7 +7,8 @@ const exportObj = {
     clone,
     checkParams,
     autoFn,
-    getFileUrl
+    getFileUrl,
+    getGroupType
 };
 // 导出对象，方便其他方法调用
 module.exports = exportObj;
@@ -75,4 +76,18 @@ function getFileUrl(req, fileName) {
         return '';
     }
     return filePath + '/upload/' + fileName;
+}
+
+/**
+ * 根据团内人数确定团的种类
+ * @param num
+ * @returns {type}
+ */
+function getGroupType(num) {
+    if (num >= 0 && num <= 2) {
+        return 3
+    } else if (num >= 3 && num <= 5) {
+        return 6
+    }
+    return 10
 }

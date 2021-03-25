@@ -11,5 +11,7 @@ router.get('/info', GroupController.info)
 
 router.get('/iscap', GroupController.iscap)
 router.get('/listbyid', GroupController.listbyid)
+router.put('/joingroup', GroupController.joingroup)
+router.post('/opengroup', GroupController.opengroup)
 
 module.exports = router;
