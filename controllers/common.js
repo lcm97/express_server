@@ -8,7 +8,8 @@ const exportObj = {
     checkParams,
     autoFn,
     getFileUrl,
-    getGroupType
+    getGroupType,
+    getNextType
 };
 // 导出对象，方便其他方法调用
 module.exports = exportObj;
@@ -84,10 +85,25 @@ function getFileUrl(req, fileName) {
  * @returns {type}
  */
 function getGroupType(num) {
-    if (num >= 0 && num <= 2) {
+    if (num >= 0 && num <= 3) {
         return 3
-    } else if (num >= 3 && num <= 5) {
+    } else if (num >= 4 && num <= 6) {
         return 6
     }
     return 10
+}
+
+/**
+ * 根据团内人数确定下一个团的种类
+ * @function num
+ * @returns {diff_num,next_type}
+ */
+function getNextType(num) {
+    if (num >= 1 && num <= 3) {
+        return [3 - num, 3]
+    } else if (num >= 4 && num <= 6) {
+        return [6 - num, 6]
+    } else {
+        return [10 - num, 10]
+    }
 }

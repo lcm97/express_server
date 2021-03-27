@@ -9,5 +9,6 @@ router.put('/update', LinksController.update);
 router.delete('/remove', LinksController.remove)
 
 router.get('/findall', LinksController.findall)
-
+router.get('/updateviews', LinksController.updateviews)
+router.get('/updateshares', LinksController.updateshares)
 module.exports = router;

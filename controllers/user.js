@@ -5,13 +5,15 @@ const Constant = require('../constant/constant');
 const dateFormat = require('dateformat');
 const fs = require('fs');
 const path = require('path');
+const { Op } = require("sequelize");
 let exportObj = {
     list,
     add,
     update,
     remove,
     info,
-    findorcreate
+    findorcreate,
+    count
 }
 module.exports = exportObj;
 
@@ -287,4 +289,38 @@ function findorcreate(req, res) {
     // 执行公共方法中的autoFn方法，返回数据
     Common.autoFn(tasks, res, resObj)
 
+}
+
+function count(req, res) {
+    const resObj = Common.clone(Constant.DEFAULT_SUCCESS);
+    let tasks = {
+        checkParams: (cb) => {
+            Common.checkParams(req.query, ['link_id'], cb);
+        },
+        query: ['checkParams', (results, cb) => {
+
+            UserModel
+                .findAndCountAll({
+                    where: {
+                        link_id: req.query.link_id,
+                        group_id: {
+                            [Op.ne]: null
+                        }
+                    }
+                })
+                .then(function(result) {
+                    resObj.data = {
+                        total: result.count
+                    };
+                    cb(null)
+                })
+                .catch(function(err) {
+                    console.log(err);
+                    cb(Constant.DEFAULT_ERROR);
+                });
+
+        }]
+    };
+    // 执行公共方法中的autoFn方法，返回数据
+    Common.autoFn(tasks, res, resObj)
 }

@@ -10,33 +10,26 @@ let exportObj = {
     update,
     remove,
     findall,
+    updateviews,
+    updateshares
 }
 
 module.exports = exportObj;
 
-//根据条件获取相应list
 function list(req, res) {
     const resObj = Common.clone(Constant.DEFAULT_SUCCESS);
     let tasks = {
-        // 校验参数方法
         checkParams: (cb) => {
-            // 调用公共方法中的校验参数方法，成功继续后面操作，失败则传递错误信息到async最终方法
             Common.checkParams(req.query, ['page', 'limit'], cb);
         },
-        // 查询方法，依赖校验参数方法
         query: ['checkParams', (results, cb) => {
-            // 根据前端提交参数计算SQL语句中需要的offset，即从多少条开始查询
             let offset = req.query.limit * (req.query.page - 1) || 0;
-            // 根据前端提交参数计算SQL语句中需要的limit，即查询多少条
             let limit = parseInt(req.query.limit) || 20;
 
-            // 设定一个查询条件对象
             let whereCondition = {};
-            // 如果查询姓名存在，查询对象增加姓名
             if (req.query.name) {
                 whereCondition.name = req.query.name;
             }
-            // 通过offset和limit使用model去数据库中查询，并按照创建时间排序
             LinksModel
                 .findAndCountAll({
                     where: whereCondition,
@@ -47,10 +40,7 @@ function list(req, res) {
                     ],
                 })
                 .then(function(result) {
-                    // 查询结果处理
-                    // 定义一个空数组list，用来存放最终结果
                     let items = [];
-                    // 遍历SQL查询出来的结果，处理后装入list
                     result.rows.forEach((v, i) => {
                         let obj = {
                             id: v.id,
@@ -60,25 +50,19 @@ function list(req, res) {
                         };
                         items.push(obj);
                     });
-                    // 给返回结果赋值，包括列表和总条数
                     resObj.data = {
                         items,
                         total: result.count
                     };
-                    // 继续后续操作
                     cb(null);
                 })
                 .catch(function(err) {
-                    // 错误处理
-                    // 打印错误日志
                     console.log(err);
-                    // 传递错误信息到async最终方法
                     cb(Constant.DEFAULT_ERROR);
                 });
 
         }]
     };
-    // 执行公共方法中的autoFn方法，返回数据
     Common.autoFn(tasks, res, resObj)
 
 }
@@ -179,7 +163,9 @@ function add(req, res) {
                 .create({
                     name: req.body.name,
                     remark: req.body.remark,
-                    music: req.body.music
+                    music: req.body.music,
+                    views: 0,
+                    shares: 0
                 })
                 .then(function(result) {
                     resObj.data = {
@@ -251,10 +237,6 @@ function remove(req, res) {
                 .then(function(result) {
                     // 删除结果处理
                     if (result) {
-                        // 如果删除成功
-                        // 继续后续操作
-                        //删除该链接下的所有内容ToDo
-
                         cb(null);
                     } else {
                         // 删除失败，传递错误信息到async最终方法
@@ -271,5 +253,61 @@ function remove(req, res) {
         }
     };
     // 执行公共方法中的autoFn方法，返回数据
+    Common.autoFn(tasks, res, resObj)
+}
+
+function updateviews(req, res) {
+    const resObj = Common.clone(Constant.DEFAULT_SUCCESS);
+    let tasks = {
+        checkParams: (cb) => {
+            Common.checkParams(req.query, ['link_id'], cb);
+        },
+        update: cb => {
+            console.log(req.query.link_id)
+            LinksModel.findByPk(req.query.link_id).then(function(result) {
+                    result.increment('views').then(function(res) {
+                        let item = res.dataValues
+                        resObj.data = { item }
+                        cb(null)
+                    })
+                })
+                .catch(function(err) {
+                    // 错误处理
+                    // 打印错误日志
+                    console.log(err);
+                    // 传递错误信息到async最终方法
+                    cb(Constant.DEFAULT_ERROR);
+                });
+
+        }
+    };
+    Common.autoFn(tasks, res, resObj)
+}
+
+function updateshares(req, res) {
+    const resObj = Common.clone(Constant.DEFAULT_SUCCESS);
+    let tasks = {
+        checkParams: (cb) => {
+            Common.checkParams(req.query, ['link_id'], cb);
+        },
+        update: cb => {
+            console.log(req.query.link_id)
+            LinksModel.findByPk(req.query.link_id).then(function(result) {
+                    result.increment('shares').then(function(res) {
+                        let item = res.dataValues
+                        resObj.data = { item }
+                        cb(null)
+                    })
+                })
+                .catch(function(err) {
+                    // 错误处理
+                    // 打印错误日志
+                    console.log(err);
+                    // 传递错误信息到async最终方法
+                    cb(Constant.DEFAULT_ERROR);
+                });
+
+        }
+    };
     Common.autoFn(tasks, res, resObj)
 }

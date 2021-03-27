@@ -8,6 +8,7 @@ const dateFormat = require('dateformat');
 const fs = require('fs');
 const path = require('path');
 const { doUntil } = require('async');
+const { getNextType } = require('./common');
 let exportObj = {
     list,
     add,
@@ -57,11 +58,14 @@ function list(req, res) {
                 .then(function(result) {
                     let items = [];
                     result.rows.forEach((v, i) => {
+                        let next_info = Common.getNextType(v.num)
                         let obj = {
                             id: v.id,
                             avatar: v.avatar,
                             type: v.type,
                             num: v.num,
+                            diff_num: next_info[0],
+                            next_type: next_info[1],
                             cap_id: v.cap_id,
                             cap_name: v.cap_name,
                             created_at: dateFormat(v.created_at, 'yyyy-mm-dd')
@@ -251,7 +255,7 @@ function info(req, res) {
                             cap_name: result.cap_name,
                             cap_id: result.cap_id,
                             crewlist: result.crewlist,
-                            created_at: result.created_at,
+                            created_at: dateFormat(result.created_at, 'yyyy-mm-dd')
                         };
                         cb(null);
                     } else {
