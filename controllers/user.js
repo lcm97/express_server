@@ -64,13 +64,14 @@ function list(req, res) {
                         obj.name = v.name === null ? '' : v.name
                         obj.phone = v.phone === null ? '' : v.phone
                         obj.link_id = v.link_id === null ? undefined : v.link_id
+                        obj.is_cap = v.is_cap === null ? '否' : v.is_cap
                         obj.course = v.course === null ? '' : v.course
                         obj.company = v.company === null ? '' : v.company
                         obj.group_id = v.group_id === null ? undefined : v.group_id
                         obj.identity = v.identity === null ? '' : v.identity
                         obj.status = v.status === null ? '未报名' : v.status
-
-                        //obj.crewlist = v.crewlist === null ? [] : v.crewlist.split(' ')
+                        obj.grade = v.grade === null ? '' : v.grade
+                            //obj.crewlist = v.crewlist === null ? [] : v.crewlist.split(' ')
                         items.push(obj);
                     });
                     resObj.data = {
@@ -159,7 +160,8 @@ function update(req, res) {
                     link_id: req.body.link_id,
                     company: req.body.company,
                     course: req.body.course,
-                    identity: req.body.identity
+                    identity: req.body.identity,
+                    grade: req.body.grade
                 }, {
                     where: {
                         id: req.body.id

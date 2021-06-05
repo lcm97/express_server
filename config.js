@@ -14,10 +14,10 @@ const config = {
 if (process.env.NODE_ENV === 'production') {
     // 生产环境MySQL数据库配置
     config.MYSQL = {
-        host: 'aaa.mysql.rds.aliyuncs.com',
-        database: 'aaa',
-        username: 'aaa',
-        password: 'aaa'
+        host: 'localhost',
+        database: 'vueapp',
+        username: 'lcm',
+        password: 'lcm5613176'
     };
 }
 // 导出配置

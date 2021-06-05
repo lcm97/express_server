@@ -136,13 +136,17 @@ function add(req, res) {
             Common.checkParams(req.body, ['name', 'company', 'img', 'price', 'class', 'status'], cb);
         },
         add: cb => {
+            console.log(req.body)
             CourseModel
                 .create({
                     name: req.body.name,
                     company: req.body.company,
                     img: req.body.img,
-                    ori_price: parseFloat(req.body.ori_price.toFixed(2)),
-                    price: parseFloat(req.body.price.toFixed(2)),
+                    //ori_price: parseFloat(parseFloat(req.body.ori_price).toFixed(2)),
+                    //price: parseFloat(parseFloat(req.body.price).toFixed(2)),
+                    ori_price: parseFloat(req.body.ori_price).toFixed(2),
+                    price: parseFloat(req.body.price).toFixed(2),
+                    link_id: req.body.link_id,
                     class: req.body.class,
                     status: req.body.status,
                     all: req.body.all,
@@ -152,21 +156,8 @@ function add(req, res) {
                     unpayed: req.body.unpayed
                 })
                 .then(function(result) {
-                    let item = {
-                        id: result.dataValues.id,
-                        name: result.dataValues.name,
-                        company: result.dataValues.company,
-                        img: result.dataValues.img,
-                        ori_price: result.dataValues.ori_price,
-                        price: result.dataValues.price,
-                        class: result.dataValues.class,
-                        status: result.dataValues.status,
-                        all: result.dataValues.all,
-                        new: result.dataValues.new,
-                        old: result.dataValues.old,
-                        payed: result.dataValues.payed,
-                        unpayed: result.dataValues.unpayed
-                    }
+
+                    let item = result.dataValues
                     resObj.data = {
                         item
                     };

@@ -9,6 +9,7 @@ const User = db.define('User', {
     name: { type: Sequelize.STRING(15), allowNull: true },
     phone: { type: Sequelize.STRING(15), allowNull: true },
     age: { type: Sequelize.INTEGER, allowNull: true },
+    is_cap: { type: Sequelize.STRING(11), allowNull: true },
     link_id: { type: Sequelize.INTEGER, allowNull: true, },
     course: { type: Sequelize.STRING(255), allowNull: true },
     company: { type: Sequelize.STRING(255), allowNull: true },

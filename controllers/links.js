@@ -300,10 +300,7 @@ function updateshares(req, res) {
                     })
                 })
                 .catch(function(err) {
-                    // 错误处理
-                    // 打印错误日志
                     console.log(err);
-                    // 传递错误信息到async最终方法
                     cb(Constant.DEFAULT_ERROR);
                 });
 
